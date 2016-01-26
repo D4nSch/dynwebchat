@@ -107,10 +107,9 @@ module.exports = function(passport) {
 //---------------------------------------------------------------------------------------------------------------
 //Nodemailer 
 
-/*                    var nodemailer = require('nodemailer');
+                    var nodemailer = require('nodemailer');
                     var transporter = nodemailer.createTransport(
                     {
-
                             host: "mail.fh-joanneum.at",
                             port: 25
                         });
@@ -130,7 +129,7 @@ module.exports = function(passport) {
                                 console.log("Message sent to " + newUser.local.email);
                             }
                         });
-*/
+
                         newUser.save(function(err) {
                             if (err) {
                                 return done(err);
@@ -139,8 +138,9 @@ module.exports = function(passport) {
                             }
                         });
 
-					   console.log("Token: "+newUser.local.token); //Token zur Authentifizierung!
-                       console.log("Active Account: "+newUser.local.active)
+                    console.log("Email: "+newUser.local.email);
+					console.log("Token: "+newUser.local.token); //Token zur Authentifizierung!
+                    console.log("Active Account: "+newUser.local.active);
 
                     }
                 });

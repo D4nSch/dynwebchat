@@ -83,9 +83,10 @@ module.exports = function(app, passport) {
 			if(token===user.local.token){
 				user.local.active = true;
 				user.save();
-				res.redirect("/");
+				res.redirect(req.get('referer'));
+
 			} else {
-				res.end("Error: Token doesn't match email");
+				res.redirect(req.get('referer'));
 			}
 		}
 	});
