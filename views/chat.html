@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <title>WebChat</title>
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="../public/css/style.css">
+        
+        <script src="http://localhost:8080/socket.io/socket.io.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script type="text/javascript">
+
+    var PORT = 8080;
+    var socketio = io.connect("127.0.0.1:"+PORT);
+
+    socketio.on("message_to_client", function(data) {
+    document.getElementById("chatlog").innerHTML = (
+    data['message'] +"<br>"+ document.getElementById("chatlog").innerHTML);
+    });
+
+    socketio.on('userCount', function(data) {
+        document.getElementById("userCount").innerHTML = "Online user: "+data.userCount;
+    });
+
+     socketio.on('hasjoined', function(data) {
+        document.getElementById("chatlog").innerHTML = (
+        /*"<span><b><%= user.local.username %></b></span>" + " " + */data.hasjoined +"<br>"+ document.getElementById("chatlog").innerHTML);
+    });
+
+     socketio.on('hasleft', function(data) {
+        document.getElementById("chatlog").innerHTML = (
+        /*"<span><b><%= user.local.username %></b></span>" + " " +*/data.hasleft +"<br>"+ document.getElementById("chatlog").innerHTML);
+    });
+
+
+        function timeStamp() {
+            // Create a date object with the current time
+            var now = new Date();
+
+            // Create an array with the current month, day and time
+            var date = [now.getDate(), now.getMonth() + 1, now.getFullYear() ];
+
+            // Create an array with the current hour, minute and second
+            var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
+
+            // Convert hour from military time
+                time[0] = ( time[0] < 12 ) ? time[0] : time[0] - 0;
+
+            // If hour is 0, set it to 12
+                time[0] = time[0] || 12;
+
+            // If seconds and minutes are less than 10, add a zero
+                for ( var i = 1; i < 3; i++ ) {
+                    if ( time[i] < 10 ) {
+                    time[i] = "0" + time[i];
+                    }
+                }
+
+            // Return the formatted string
+            return date.join("/") + " " + time.join(":");
+        }
+
+        function sendMessage() {
+
+        name = document.getElementById("name_input").value;
+
+        msg = document.getElementById("message_input").value;
+        msgtime = timeStamp();
+
+        if(name == "") {
+            name = "Anonymous";
+            } else {
+                name = document.getElementById("name_input").value;
+            }
+
+        if(msg == "") {
+            alert("Geben Sie eine Nachricht ein!")
+        } else {
+
+        var msg = msgtime+"<br>"+"<b>"+name+"</b>"+": "+document.getElementById("message_input").value;
+        socketio.emit("message_to_server", { message : msg});
+
+        document.getElementById("message_input").value = "";
+        }
+    }
+
+    //Damit mit Enter auch messages gehn!
+    $(document).ready(function(){
+    $("#message_input").keypress(function(event) {
+    if (event.which == 13) {
+        sendMessage();
+        
+     }
+});
+});
+
+        </script>
+
+    </head>
+    <body>
+	<div class="container">
+		<div class="jumbotron">
+        	<div class=text-right>
+            	<a href="/logout" class="btn btn-info">Logout</a>
+			</div>
+			<h1 class="text-center">WebChat</h1>
+            <span class="text-center" id="userCount"></span>
+            <input type="text" class="form-control" id="name_input" placeholder="<%= user.local.username %>" value="<%= user.local.username %>" readonly>
+            <div class="chat-messages form-control">
+                <span id="chatlog" class="chat-message">
+                </span>
+            </div>
+
+            <input class="chat-textarea input-lg" id="message_input" placeholder="type your message">
+
+            <button class="btn btn-success btn-primary btn-lg btn-block" id="submit-button" onclick="sendMessage()">Send</button>
+
+       </div>
+	</div>
+    </body>
+<html>
