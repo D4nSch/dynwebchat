@@ -61,7 +61,7 @@ module.exports = function(app, passport) {
         }));
         
         
-    //verify----------------------------------
+    //verify---------------------------------	
     app.post('/verify', function(req, res){
 	//Get token and email from GET
 	var token = req.body.token;
@@ -84,7 +84,6 @@ module.exports = function(app, passport) {
 				user.local.active = true;
 				user.save();
 				res.redirect(req.get('referer'));
-
 			} else {
 				res.redirect(req.get('referer'));
 			}
