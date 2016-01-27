@@ -3,7 +3,7 @@
 
 ## General
 
-Simple chat application, which transmits messages from one client to all others. The only special node.js module used is socket.io, it allows us to create a socket connection between the server and clients and call events and send data back and forth. Further modules were used!
+Simple chat application, which transmits messages from one client to all others. The main node.js module used is socket.io, which allows us to create a socket connection between the server and clients and call events and send data back and forth. Further modules were used!
 
 ## Requirements
 
@@ -23,7 +23,7 @@ Simple chat application, which transmits messages from one client to all others.
 3. Enter the token to complete your registration!
 4. Start to chat!
 
-## Further ideas
+## Further ideas...
 
 * Online user list
 * Private chats
@@ -34,5 +34,10 @@ Simple chat application, which transmits messages from one client to all others.
 * git add *
 * git commit -m "msg"
 * git push
+
+#### used sources:
+* https://scotch.io/tutorials/an-introduction-to-mongodb
+* http://nodecode.de/chat-nodejs-websocket + http://socket.io/get-started/chat/
+* basic module knowledge from different sites
 
 

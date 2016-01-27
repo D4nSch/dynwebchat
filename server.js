@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var config = require("./config.js")
+var config = require("./config/config.js")
 
 console.log("\n\033[1;32mDynWeb-Project\033[0m: Chat")
 

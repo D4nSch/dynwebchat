@@ -1,52 +1,59 @@
-#!/usr/bin/env node
-
 startup = function(){
 
-// set up ======================================================================
-// get all the tools we need
-var config = require("./config.js")
-var express  = require('express');
-var app      = express();
+//---------------------------------------------------------------------------------------------------------------
+//GENERAL SET UP
+
+//TOOLS WE NEED
+var config = require("./config/config.js") //get the general config
 var port     = config.port;
-var mongoose = require('mongoose');
-var passport = require('passport');
-var flash    = require('connect-flash');
-var path = require("path")
 
-var morgan       = require('morgan');
-var cookieParser = require('cookie-parser');
+var express  = require('express'); //NodeJS framework
+var app      = express();
+
+var mongoose = require('mongoose'); //connects us to the db (MongoDB)
+var passport = require('passport'); //to handle authentifications
+var flash    = require('connect-flash'); //stores messages in the session 
+var morgan       = require('morgan'); //logs all requests to the console
+var cookieParser = require('cookie-parser'); 
 var bodyParser   = require('body-parser');
-var session      = require('express-session');
+var session      = require('express-session'); //creates sessions
 
-var configDB = require('./config/database.js');
+var configDB = require('./config/database.js'); //get the database config
 
-// configuration ===============================================================
+//---------------------------------------------------------------------------------------------------------------
+//DB SET UP
 mongoose.connect(configDB.url); // connect to our database
 
-require('./config/passport')(passport); // pass passport for configuration
+//---------------------------------------------------------------------------------------------------------------
+//PASSPORT SET UP
+require('./controller/passport.js')(passport); // pass passport for configuration
 
-// set up our express application
-app.use(morgan('dev')); // log every request to the console
-app.use(cookieParser()); // read cookies (needed for auth)
-app.use(bodyParser.json()); // get information from html forms
-app.use(bodyParser.urlencoded({ extended: true }));
+//---------------------------------------------------------------------------------------------------------------
+//SET UP EXPRESS APPLICATION
 
-app.set('view engine', 'ejs'); // set up ejs for templating
+app.use(morgan('dev')); //log every request to the console
+app.use(cookieParser()); //reads cookies (needed for auth)
+app.use(bodyParser.json()); //get information from html forms
+app.use(bodyParser.urlencoded({ extended: true })); //parsing html forms
 
-app.use(express.static(__dirname, '/public'));
+app.set('view engine', 'ejs'); //to use ejs (html/javascript template)
 
-// required for passport
-app.use(session({ secret: 'wow4ever' })); // session secret
+app.use(express.static(__dirname, '/public')); //provide static files (like .css)
+
+//REQUIREMENTS FOR PASSPORT
+app.use(session({ secret: 'wow4ever' })); //session secret
 app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
-app.use(flash()); // use connect-flash for flash messages stored in session
+app.use(passport.session()); //persistent login sessions
+app.use(flash()); //flash messages stored in session
 
-// routes ======================================================================
-require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+//ROUTES
+require('./controller/routes.js')(app, passport); //load routes and pass in our app and fully configured passport
 
-//============================================================================================================================================
 
 var server = app.listen(port);
+
+//---------------------------------------------------------------------------------------------------------------
+//SET UP SOCKET.IO
 
 var io = require('socket.io').listen(server);
 
@@ -54,22 +61,21 @@ var userCount = 0;
 var hasleft = "A user has left the Chat!"
 var hasjoined = "A user has joined the Chat!"
 	
-	io.sockets.on('connection', function(socket) {
-		userCount++;
-		io.sockets.emit('hasjoined', { hasjoined: hasjoined})
-  		io.sockets.emit('userCount', { userCount: userCount });
+	io.sockets.on('connection', function(socket) { //get to know all connections
+		  userCount++;
+		  io.sockets.emit('hasjoined', { hasjoined: hasjoined}) //send
+      io.sockets.emit('userCount', { userCount: userCount }); //send
   	
-  	socket.on('disconnect', function() {
+  	socket.on('disconnect', function() { //get to know all disconnects
     	userCount--;
-    	io.sockets.emit('hasleft', { hasleft: hasleft})
+    	io.sockets.emit('hasleft', { hasleft: hasleft}) 
     	io.sockets.emit('userCount', { userCount: userCount });
   	});
 
-    socket.on('message_to_server', function(data) {
-        io.sockets.emit("message_to_client",{ message: data["message"] });
+    socket.on('message_to_server', function(data) { //sending messages
+      io.sockets.emit("message_to_client",{ message: data["message"] });
     	});
 	});
-//============================================================================================================================================
 }
 
 module.exports.startup = startup

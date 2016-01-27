@@ -3,36 +3,44 @@
     <head>
 
         <title>WebChat | Chatroom</title>
+
+        <!--CSS files-->
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
         <link rel="stylesheet" type="text/css" href="../public/css/style.css">
         
+        <!--LOAD socket.io-->
         <script src="http://localhost:8080/socket.io/socket.io.js"></script>
+
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script type="text/javascript">
 
-    var PORT = 8080;
-    var socketio = io.connect("127.0.0.1:"+PORT);
+        var server = "127.0.0.1:"
+        var port = 8080
+        var socketio = io.connect(server+port);
 
-    socketio.on("message_to_client", function(data) {
-    document.getElementById("chatlog").innerHTML = (
-    data['message'] +"<br>"+ document.getElementById("chatlog").innerHTML);
-    });
+        //if socket.io notices a message, chatlog gets changed!
+        socketio.on("message_to_client", function(data) {
+            document.getElementById("chatlog").innerHTML = (
+            data['message'] +"<br>"+ document.getElementById("chatlog").innerHTML);
+        });
 
-    socketio.on('userCount', function(data) {
-        document.getElementById("userCount").innerHTML = "Online user: "+data.userCount;
-    });
+        socketio.on('userCount', function(data) {
+            document.getElementById("userCount").innerHTML = "Online user: "+data.userCount;
+        });
 
-     socketio.on('hasjoined', function(data) {
-        document.getElementById("chatlog").innerHTML = (
+        socketio.on('hasjoined', function(data) {
+            document.getElementById("chatlog").innerHTML = (
         /*"<span><b><%= user.local.username %></b></span>" + " " + */data.hasjoined +"<br>"+ document.getElementById("chatlog").innerHTML);
-    });
+        });
 
-     socketio.on('hasleft', function(data) {
-        document.getElementById("chatlog").innerHTML = (
-        /*"<span><b><%= user.local.username %></b></span>" + " " +*/data.hasleft +"<br>"+ document.getElementById("chatlog").innerHTML);
-    });
+        socketio.on('hasleft', function(data) {
+            document.getElementById("chatlog").innerHTML = (
+            /*"<span><b><%= user.local.username %></b></span>" + " " +*/data.hasleft +"<br>"+ document.getElementById("chatlog").innerHTML);
+        });
 
+//---------------------------------------------------------------------------------------------------------------
+//CREATE A TIMESTAMP
 
         function timeStamp() {
             // Create a date object with the current time
@@ -63,40 +71,41 @@
 
         function sendMessage() {
 
-        name = document.getElementById("name_input").value;
+            name = document.getElementById("name_input").value;
 
-        msg = document.getElementById("message_input").value;
-        msgtime = timeStamp();
+            msg = document.getElementById("message_input").value;
+            msgtime = timeStamp();
 
         if(name == "") {
             name = "Anonymous";
-            } else {
-                name = document.getElementById("name_input").value;
-            }
+        } else {
+            name = document.getElementById("name_input").value;
+        }
 
         if(msg == "") {
-            alert("Geben Sie eine Nachricht ein!")
+            alert("Please enter a message!")
         } else {
+            var msg = msgtime+"<br>"+"<b>"+name+"</b>"+": "+document.getElementById("message_input").value;
+            socketio.emit("message_to_server", { message : msg});
 
-        var msg = msgtime+"<br>"+"<b>"+name+"</b>"+": "+document.getElementById("message_input").value;
-        socketio.emit("message_to_server", { message : msg});
-
-        document.getElementById("message_input").value = "";
+            document.getElementById("message_input").value = "";
         }
-    }
+        }
 
-    //Damit mit Enter auch messages gehn!
+//---------------------------------------------------------------------------------------------------------------
+//AJAX to enter messages with the "enter"-key in an input field!
+
     $(document).ready(function(){
     $("#message_input").keypress(function(event) {
     if (event.which == 13) {
         sendMessage();
-        
-     }
-});
+    }
+    });
 });
 
-        </script>
+    </script>
 
+    <!--HTML-->
     </head>
     <body>
 	<div class="container">
